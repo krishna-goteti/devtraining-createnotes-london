@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[	function TicTacToeCntl($scope, $location) {
+  $scope.cellStyle= {
+    'height': '20px',
+    'width': '20px',
+    'border': '1px solid black',
+    'text-align': 'center',
+    'vertical-align': 'middle',
+    'cursor': 'pointer'
+  };
+
+  $scope.reset = function() {
+    $scope.board = [
+      ['', '', ''],
+      ['', '', ''],
+      ['', '', '']
+    ];
+    $scope.nextMove = 'X';
+    $scope.winner = '';
+    setUrl();
+  };
+
+  $scope.dropPiece = function(row, col) {
+    if (!$scope.winner && !$scope.board[row][col]) {
+      $scope.board[row][col] = $scope.nextMove;
+      $scope.nextMove = $scope.nextMove == 'X' ? 'O' : 'X';
+      setUrl();
+    }
+  };
+
+  $scope.reset();
+  $scope.$watch(function() { return $location.search().board;}, readUrl);
+
+  function setUrl() {
+    var rows = [];
+    angular.forEach($scope.board, function(row) {
+      rows.push(row.join(','));
+    });
+    $location.search({board: rows.join(';') + '/' + $scope.nextMove});
+  }
+
+  function grade() {
+    var b = $scope.board;
+    $scope.winner =
+      row(0) || row(1) || row(2) ||
+      col(0) || col(1) || col(2) ||
+      diagonal(-1) || diagonal(1);
+    function row(row) { return same(b[row][0], b[row][1], b[row][2]);}
+    function col(col) { return same(b[0][col], b[1][col], b[2][col]);}
+    function diagonal(i) { return same(b[0][1-i], b[1][1], b[2][1+i]);}
+    function same(a, b, c) { return (a==b && b==c) ? a : '';};
+  }
+
+  function readUrl(value) {
+    if (value) {
+      value = value.split('/');
+      $scope.nextMove = value[1];
+      angular.forEach(value[0].split(';'), function(row, col){
+        $scope.board[col] = row.split(',');
+      });
+      grade();
+    }
+  }
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>ng-invalid { border: 1px solid red; }
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>tictactoe</id>
+        <internal>false</internal>
+        <link/>
+        <name>TicTacToe</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+  /* populate the 'data' object */
+  /* e.g., data.table = $sp.getValue('table'); */
+
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-08-21 07:17:12</sys_created_on>
+        <sys_id>c92edc794f0023000b81045e9310c78a</sys_id>
+        <sys_mod_count>9</sys_mod_count>
+        <sys_name>TicTacToe</sys_name>
+        <sys_package display_value="CreateNotes" source="x_snc_createnotes">df5fd9a5090232007f44e1046c8ff69f</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="CreateNotes">df5fd9a5090232007f44e1046c8ff69f</sys_scope>
+        <sys_update_name>sp_widget_c92edc794f0023000b81045e9310c78a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-08-21 07:33:02</sys_updated_on>
+        <template><![CDATA[<div ng-app="">
+  <h4>Tic-Tac-Toe</h4>
+  <div ng-controller="TicTacToeCntl">
+  Next Player: {{nextMove}}
+  <div class="winner" ng-show="winner">Player {{winner}} has won!</div>
+    <table class="board">
+      <tr ng-repeat="row in board" style="height:15px;">
+        <td ng-repeat="cell in row" ng-style="cellStyle"
+            ng-click="dropPiece($parent.$index, $index)">{{cell}}</td>
+      </tr>
+    </table>
+    <button ng-click="reset()">reset board</button>
+  </div>
+</div>]]></template>
+    </sp_widget>
+</record_update>
